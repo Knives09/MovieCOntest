@@ -1,0 +1,80 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: movie_challenge_app
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: movie_challenge
+      MYSQL_USER: challenge_user
+      MYSQL_PASSWORD: challenge_pass
+      NEO4J_HOST: neo4j
+      NEO4J_PORT: 7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: challenge123
+      TMDB_API_KEY: 95f11492d8329d7a4db499b1ba7e9b02
+      TMDB_ACCESS_TOKEN: eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5NWYxMTQ5MmQ4MzI5ZDdhNGRiNDk5YjFiYTdlOWIwMiIsIm5iZiI6MTc4MjkwNDQ2My4xMTgsInN1YiI6IjZhNDRmNjhmYzg1ZDcxMmNlMTVkMWVkMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.-ofzX5L2zujtSap_m5lzXQHfFNB9dDldD1jM8sXtUok
+      TMDB_BASE_URL: https://api.themoviedb.org/3
+      APP_DEBUG: "true"
+      APP_TIMEZONE: Europe/Rome
+    depends_on:
+      mysql:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    command: php -S 0.0.0.0:8080 -t public/
+
+
+  mysql:
+    image: mysql:8.0
+    container_name: movie_challenge_mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: challenge
+      MYSQL_DATABASE: movie_challenge
+      MYSQL_USER: challenge_user
+      MYSQL_PASSWORD: challenge_pass
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password --max-connections=200 --innodb-buffer-pool-size=256M
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pchallenge"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  neo4j:
+    image: neo4j:5-community
+    container_name: movie_challenge_neo4j
+    restart: unless-stopped
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: neo4j/challenge123
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_server_memory_heap_initial__size: 256m
+      NEO4J_server_memory_heap_max__size: 512m
+      NEO4J_server_memory_pagecache_size: 256m
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "challenge123", "RETURN 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:
+  neo4j_data:
+  neo4j_logs:
