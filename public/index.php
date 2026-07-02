@@ -9,6 +9,21 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+// Basic Authentication
+$authUser = 'mashfrog';
+$authPass = 'Movies123!';
+
+if (!isset($_SERVER['PHP_AUTH_USER']) || 
+    !isset($_SERVER['PHP_AUTH_PW']) || 
+    $_SERVER['PHP_AUTH_USER'] !== $authUser || 
+    $_SERVER['PHP_AUTH_PW'] !== $authPass
+) {
+    header('WWW-Authenticate: Basic realm="MovieChallenge Realm"');
+    header('HTTP/1.0 401 Unauthorized');
+    echo 'Richiesta autenticazione per accedere al progetto.';
+    exit;
+}
+
 use Dotenv\Dotenv;
 use MovieChallenge\Router;
 use MovieChallenge\Service\ChallengeService;

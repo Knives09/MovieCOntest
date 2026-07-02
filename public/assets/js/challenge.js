@@ -62,7 +62,7 @@ function setupChallenge1() {
         runBtn.addEventListener('click', async () => {
             const actorId = parseInt(document.getElementById('selected-actor-id').value);
             const maxDepth = 6;
-            const teamName = document.querySelector('.team-btn.active')?.dataset.team || '';
+            const teamName = document.getElementById('team-code-input')?.value.trim().toUpperCase() || '';
             const queryVal = document.getElementById('sql-query-input')?.value || '';
 
             if (!actorId) return;
@@ -115,7 +115,7 @@ function setupChallenge2() {
         runBtn.addEventListener('click', async () => {
             const actorId1 = parseInt(document.getElementById('selected-actor1-id').value);
             const actorId2 = parseInt(document.getElementById('selected-actor2-id').value);
-            const teamName = document.querySelector('.team-btn.active')?.dataset.team || '';
+            const teamName = document.getElementById('team-code-input')?.value.trim().toUpperCase() || '';
             const queryVal = document.getElementById('sql-query-input')?.value || '';
 
             if (!actorId1 || !actorId2) return;
@@ -168,7 +168,7 @@ function setupChallenge3() {
         runBtn.addEventListener('click', async () => {
             const userId = parseInt(document.getElementById('user-select')?.value || 1);
             const minRating = parseFloat(document.querySelector('.rating-btn.active')?.dataset.rating || 3.5);
-            const teamName = document.querySelector('.team-btn.active')?.dataset.team || '';
+            const teamName = document.getElementById('team-code-input')?.value.trim().toUpperCase() || '';
             const queryVal = document.getElementById('sql-query-input')?.value || '';
 
             setRunning(runBtn, true);

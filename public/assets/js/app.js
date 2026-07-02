@@ -208,11 +208,12 @@ function updateRunButton() {
     if (!challengePage) return;
 
     const challengeId = parseInt(challengePage.dataset.challengeId);
-    const teamSelected = document.querySelector('.team-btn.active');
+    const teamCodeInput = document.getElementById('team-code-input');
+    const teamCode = teamCodeInput ? teamCodeInput.value.trim() : '';
     const queryInput = document.getElementById('sql-query-input');
     const queryText = queryInput ? queryInput.value.trim() : '';
     
-    let ready = !!teamSelected && queryText.length > 5;
+    let ready = teamCode.length >= 2 && queryText.length > 5;
 
     if (challengeId === 1) {
         ready = ready && !!document.getElementById('selected-actor-id')?.value;
@@ -224,7 +225,7 @@ function updateRunButton() {
 
     runBtn.disabled = !ready;
     if (scalabilityBtn) {
-        scalabilityBtn.disabled = !teamSelected || !document.getElementById('selected-actor-id')?.value;
+        scalabilityBtn.disabled = teamCode.length < 2 || !document.getElementById('selected-actor-id')?.value;
     }
 }
 
@@ -416,14 +417,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load dashboard stats
     loadDashboardStats();
 
-    // Setup team selector
-    document.querySelectorAll('.team-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            updateRunButton();
-        });
-    });
+    // Setup team code input
+    const teamCodeInput = document.getElementById('team-code-input');
+    if (teamCodeInput) {
+        teamCodeInput.addEventListener('input', updateRunButton);
+    }
 
     // Setup depth selector
     document.querySelectorAll('.depth-btn').forEach(btn => {

@@ -83,14 +83,14 @@
         <h2 class="section-title">Esegui la Sfida</h2>
         
         <div class="controls-card" id="challenge-controls">
-            <!-- Team Selection -->
+            <!-- Team Code Input -->
             <div class="control-group">
-                <label class="control-label">Squadra</label>
-                <div class="team-selector" id="team-selector">
-                    <button class="team-btn" data-team="Team Alpha" id="btn-team-alpha">🦁 Team Alpha</button>
-                    <button class="team-btn" data-team="Team Beta" id="btn-team-beta">🐲 Team Beta</button>
-                    <button class="team-btn" data-team="Team Gamma" id="btn-team-gamma">🦅 Team Gamma</button>
-                </div>
+                <label class="control-label" for="team-code-input">Codice Squadra</label>
+                <input type="text" id="team-code-input" class="search-input" 
+                       placeholder="Inserisci il codice della tua squadra..." 
+                       autocomplete="off" maxlength="30"
+                       style="text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
+                <p class="control-hint">Ogni squadra deve usare il proprio codice univoco assegnato dal docente.</p>
             </div>
 
             <?php if ($challenge['id'] === 1): ?>
