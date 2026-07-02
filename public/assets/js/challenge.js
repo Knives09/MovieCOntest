@@ -89,29 +89,7 @@ function setupChallenge1() {
         });
     }
 
-    // Scalability test button
-    const scalabilityBtn = document.getElementById('run-scalability');
-    if (scalabilityBtn) {
-        scalabilityBtn.addEventListener('click', async () => {
-            const actorId = parseInt(document.getElementById('selected-actor-id').value);
-            if (!actorId) return;
 
-            setRunning(scalabilityBtn, true);
-
-            try {
-                const result = await apiRequest('/api/challenge/1/scalability', {
-                    method: 'POST',
-                    body: JSON.stringify({ actor_id: actorId }),
-                });
-
-                displayScalabilityResults(result);
-            } catch (error) {
-                alert('Errore: ' + error.message);
-            } finally {
-                setRunning(scalabilityBtn, false);
-            }
-        });
-    }
 }
 
 // ============================================================
@@ -270,11 +248,6 @@ function displayResults(result, challengeId) {
     // Toggle Neo4j specific visual panels based on Teacher Mode
     if (resultNeo4jPanel) resultNeo4jPanel.style.display = isTeacher ? 'block' : 'none';
     if (resultVsContainer) resultVsContainer.style.display = isTeacher ? 'block' : 'none';
-    if (resultsComparisonContainer) {
-        resultsComparisonContainer.style.gridTemplateColumns = isTeacher ? '1fr auto 1fr' : '1fr';
-        // Center MySQL panel when solo
-        resultsComparisonContainer.style.justifyItems = isTeacher ? 'stretch' : 'center';
-    }
 
     // If SQL errored, display N/A for MySQL performance metrics
     if (isSqlError) {
@@ -359,48 +332,7 @@ function populateDataTable(result, challengeId) {
     ).join('');
 }
 
-// ============================================================
-// Scalability Results
-// ============================================================
 
-function displayScalabilityResults(data) {
-    const container = document.getElementById('scalability-chart-container');
-    const section = document.getElementById('results-section');
-
-    if (container) {
-        container.style.display = 'block';
-    }
-    if (section) {
-        section.style.display = 'block';
-        container?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    // Create scalability chart
-    createScalabilityChart('scalabilityChart', data);
-
-    // Populate summary table
-    const thead = document.getElementById('data-thead');
-    const tbody = document.getElementById('data-tbody');
-    if (thead && tbody) {
-        thead.innerHTML = `<tr>
-            <th>Profondità</th>
-            <th>MySQL (ms)</th>
-            <th>Neo4j (ms)</th>
-            <th>Speedup</th>
-            <th>Risultati MySQL</th>
-            <th>Risultati Neo4j</th>
-        </tr>`;
-
-        tbody.innerHTML = data.map(d => `<tr>
-            <td><strong>${d.depth} hop</strong></td>
-            <td style="color: #f97316">${d.mysql_timeout ? '⏰ TIMEOUT' : d.mysql_ms.toFixed(1) + ' ms'}</td>
-            <td style="color: #00b4d8">${d.neo4j_ms.toFixed(1)} ms</td>
-            <td style="color: #10b981; font-weight: 700">${d.speedup}x</td>
-            <td>${d.mysql_count}</td>
-            <td>${d.neo4j_count}</td>
-        </tr>`).join('');
-    }
-}
 
 // ============================================================
 // Benchmark Page

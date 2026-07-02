@@ -240,6 +240,43 @@ window.isTeacherMode = function() {
     return localStorage.getItem('teacher_mode') === 'true';
 };
 
+window.highlightCypher = function(codeText) {
+    if (!codeText) return '';
+    let html = codeText
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    
+    // Keywords
+    const keywords = [
+        'MATCH', 'RETURN', 'WHERE', 'UNWIND', 'AS', 'CASE', 'WHEN', 'THEN', 'END', 
+        'ORDER BY', 'LIMIT', 'DESC', 'AND', 'OR', 'NOT'
+    ];
+    keywords.forEach(kw => {
+        const regex = new RegExp('\\b(' + kw + ')\\b', 'gi');
+        html = html.replace(regex, '<span class="cypher-kw">$1</span>');
+    });
+
+    // Functions
+    const funcs = ['shortestPath', 'nodes', 'min', 'length'];
+    funcs.forEach(f => {
+        const regex = new RegExp('\\b(' + f + ')\\b', 'g');
+        html = html.replace(regex, '<span class="cypher-func">$1</span>');
+    });
+
+    // Variables / Nodes label (:Actor, :Movie, :User)
+    html = html.replace(/(:\w+)/g, '<span class="cypher-label">$1</span>');
+
+    // Relationships (e.g. -[:ACTED_IN*]-> or -[r1:REVIEWED]->)
+    html = html.replace(/(-(?:\[.*\])?-&gt;)/g, '<span class="cypher-rel">$1</span>');
+    html = html.replace(/(&lt;-(?:\[.*\])?-)/g, '<span class="cypher-rel">$1</span>');
+
+    // Params ($actorId, etc)
+    html = html.replace(/(\$\w+)/g, '<span class="cypher-param">$1</span>');
+
+    return html;
+};
+
 window.setTeacherMode = function(enabled) {
     localStorage.setItem('teacher_mode', enabled ? 'true' : 'false');
     applyTeacherModeStyles();
@@ -279,15 +316,18 @@ window.applyTeacherModeStyles = function() {
         }
     });
 
-    // Challenge page layout grids adjust
-    const queryComparison = document.getElementById('query-comparison');
-    if (queryComparison) {
-        queryComparison.style.gridTemplateColumns = isTeacher ? '1fr 1fr' : '1fr';
+    // Highlight Cypher query code if present
+    const cypherCodeEl = document.getElementById('cypher-code');
+    if (cypherCodeEl && !cypherCodeEl.dataset.highlighted) {
+        cypherCodeEl.innerHTML = window.highlightCypher(cypherCodeEl.textContent);
+        cypherCodeEl.dataset.highlighted = 'true';
     }
 
-    const weaknessGrid = document.getElementById('weakness-grid');
-    if (weaknessGrid) {
-        weaknessGrid.style.gridTemplateColumns = isTeacher ? '1fr 1fr' : '1fr';
+    // Toggle body class to trigger responsive CSS grids
+    if (isTeacher) {
+        document.body.classList.add('teacher-mode-active');
+    } else {
+        document.body.classList.remove('teacher-mode-active');
     }
 
     // Leaderboard page: Show or hide Reset button

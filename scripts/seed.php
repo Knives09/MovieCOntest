@@ -61,11 +61,11 @@ echo "   🔗 Cast relations: " . count($data['cast']) . "\n\n";
 echo "⭐ Step 2: Generating synthetic reviews...\n";
 
 $movieIds = array_keys($data['movies']);
-$reviewData = $importer->generateReviews($movieIds, 33, 30);
+$reviewData = $importer->generateReviews($movieIds, 300, 60);
 $data['users'] = $reviewData['users'];
 $data['reviews'] = $reviewData['reviews'];
 
-echo "   👥 Users: " . count($data['users']) . " (11 per team × 3 teams)\n";
+echo "   👥 Users: " . count($data['users']) . " (100 per team × 3 teams)\n";
 echo "   ⭐ Reviews: " . count($data['reviews']) . "\n\n";
 
 // ============================================================
@@ -99,6 +99,16 @@ try {
 }
 
 echo "\n";
+
+// ============================================================
+// Save dump file for offline deployment import
+// ============================================================
+$dataDir = __DIR__ . '/../data';
+if (!is_dir($dataDir)) {
+    mkdir($dataDir, 0755, true);
+}
+file_put_contents($dataDir . '/dump.json', json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+echo "💾 Dump offline dei dati salvato in: data/dump.json\n\n";
 
 // ============================================================
 // Done!

@@ -39,35 +39,41 @@
         </p>
         <div class="query-comparison" id="query-comparison">
             <div class="query-panel mysql-panel" id="mysql-query-panel">
-                <div class="query-panel-header">
-                    <div style="display: flex; align-items: center; gap: var(--space-md);">
+                <div class="query-panel-header" style="display: flex; flex-direction: column; align-items: stretch; gap: var(--space-xs); padding: var(--space-sm) var(--space-lg);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                         <span class="db-tag tag-mysql">🐬 MySQL / SQL Editor</span>
-                        <button id="reset-template-btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); color: var(--text-secondary); cursor: pointer; font-size: 0.75rem; padding: 2px 8px; transition: all var(--transition-fast);">
+                        <button id="reset-template-btn" style="background: rgba(255,255,255,0.08); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); color: var(--text-primary); cursor: pointer; font-size: 0.75rem; padding: 3px 10px; transition: all var(--transition-fast);">
                             🔄 Ripristina Template
                         </button>
                     </div>
-                    <span class="query-lines" id="placeholder-info">
-                        <?php if ($challenge['id'] === 1): ?>
-                            Parametri attesi: <code>:actor_id</code>, <code>:max_depth</code>
-                        <?php elseif ($challenge['id'] === 2): ?>
-                            Parametri attesi: <code>:actor_id_1</code>, <code>:actor_id_2</code>
-                        <?php elseif ($challenge['id'] === 3): ?>
-                            Parametri attesi: <code>:user_id</code>, <code>:min_rating</code>
-                        <?php endif; ?>
-                    </span>
+                    <div style="border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: var(--space-xs); display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">Parametri query:</span>
+                        <span class="query-lines" id="placeholder-info" style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--neo4j-primary); font-weight: 600;">
+                            <?php if ($challenge['id'] === 1): ?>
+                                :actor_id, :max_depth (fissato a 6)
+                            <?php elseif ($challenge['id'] === 2): ?>
+                                :actor_id_1, :actor_id_2
+                            <?php elseif ($challenge['id'] === 3): ?>
+                                :user_id, :min_rating
+                            <?php endif; ?>
+                        </span>
+                    </div>
                 </div>
                 <textarea id="sql-query-input" class="query-textarea" data-template="<?= htmlspecialchars($sqlTemplate) ?>" placeholder="Scrivi la tua query SQL qui..."><?= htmlspecialchars($sqlTemplate) ?></textarea>
             </div>
             
             <div class="query-panel neo4j-panel teacher-only" id="neo4j-query-panel" style="display:none">
-                <div class="query-panel-header">
-                    <span class="db-tag tag-neo4j">🔵 Riferimento Neo4j / Cypher</span>
-                    <span class="query-lines" id="cypher-lines">— righe</span>
+                <div class="query-panel-header" style="display: flex; flex-direction: column; align-items: stretch; gap: var(--space-xs); padding: var(--space-sm) var(--space-lg);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <span class="db-tag tag-neo4j">🔵 Riferimento Neo4j / Cypher</span>
+                        <span class="query-lines" id="cypher-lines" style="font-size: 0.75rem; color: var(--text-muted);">— righe</span>
+                    </div>
+                    <div style="border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: var(--space-xs); display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">Traversal Grafo:</span>
+                        <span style="font-size: 0.75rem; color: var(--accent-success); font-weight: 600;">Nativo ed Ottimizzato</span>
+                    </div>
                 </div>
-                <div class="neo4j-lock-placeholder" id="neo4j-lock-placeholder" style="display:none">
-                    🔒 Query a grafo nascosta (Riservata al Docente)
-                </div>
-                <pre class="query-code" id="neo4j-query-code" style="display:none"><code id="cypher-code"><?= htmlspecialchars($cypherQuery) ?></code></pre>
+                <pre class="query-code" id="neo4j-query-code"><code id="cypher-code"><?= htmlspecialchars($cypherQuery) ?></code></pre>
             </div>
         </div>
     </div>
@@ -163,12 +169,6 @@
                     <span class="run-text">Esegui Challenge</span>
                     <span class="run-loading" style="display:none">⏳ In esecuzione...</span>
                 </button>
-                <?php if ($challenge['id'] === 1): ?>
-                <button class="run-btn run-btn-secondary" id="run-scalability" disabled>
-                    <span class="run-icon">📈</span>
-                    <span class="run-text">Test Scalabilità</span>
-                </button>
-                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -223,12 +223,7 @@
             <canvas id="resultChart"></canvas>
         </div>
 
-        <!-- Scalability Chart (Challenge 1 only) -->
-        <div class="chart-container" id="scalability-chart-container" style="display:none">
-            <h3 class="chart-title">📈 Test Scalabilità: Tempo vs Profondità</h3>
-            <p class="chart-subtitle">Guarda come MySQL degenera esponenzialmente all'aumentare della profondità</p>
-            <canvas id="scalabilityChart"></canvas>
-        </div>
+
 
         <!-- Result Data Table -->
         <div class="result-data" id="result-data">

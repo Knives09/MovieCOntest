@@ -35,10 +35,7 @@
                     <span class="nav-icon">🎯</span>
                     Sfide
                 </a>
-                <a href="/benchmark" class="nav-link <?= ($_SERVER['REQUEST_URI'] === '/benchmark' ? 'active' : '') ?>" id="nav-benchmark">
-                    <span class="nav-icon">⚡</span>
-                    Benchmark
-                </a>
+
                 <a href="/leaderboard" class="nav-link <?= ($_SERVER['REQUEST_URI'] === '/leaderboard' ? 'active' : '') ?>" id="nav-leaderboard">
                     <span class="nav-icon">🏆</span>
                     Classifica

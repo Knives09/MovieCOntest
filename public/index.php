@@ -62,12 +62,7 @@ $router->get('/challenge/{id}', function (array $params) {
     ]);
 });
 
-// Benchmark page
-$router->get('/benchmark', function () {
-    Router::render('benchmark', [
-        'pageTitle' => 'Benchmark — MovieChallenge',
-    ]);
-});
+
 
 // Leaderboard page
 $router->get('/leaderboard', function () {
