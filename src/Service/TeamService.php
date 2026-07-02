@@ -62,7 +62,7 @@ class TeamService
                         MAX(completed_at) as last_activity
                  FROM challenge_results
                  GROUP BY team_name
-                 ORDER BY total_score DESC"
+                 ORDER BY total_score DESC, avg_mysql_ms ASC"
             );
             return $stmt->fetchAll();
         } catch (\PDOException $e) {

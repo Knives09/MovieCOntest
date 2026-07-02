@@ -61,8 +61,19 @@ $router->get('/challenge/{id}', function (array $params) {
         'sqlTemplate' => $challengeService->getSqlTemplate($id),
     ]);
 });
+// Schema page
+$router->get('/schema', function () {
+    Router::render('schema', [
+        'pageTitle' => 'Schema Database — MovieChallenge',
+    ]);
+});
 
-
+// Graph Schema page (Teacher Mode)
+$router->get('/graph-schema', function () {
+    Router::render('graph-schema', [
+        'pageTitle' => 'Schema Grafo Neo4j — MovieChallenge',
+    ]);
+});
 
 // Leaderboard page
 $router->get('/leaderboard', function () {
@@ -279,7 +290,7 @@ $router->post('/api/leaderboard/reset', function () {
 $router->get('/api/users', function () {
     try {
         $db = \MovieChallenge\Database\MySQLConnection::getInstance();
-        $stmt = $db->query("SELECT id, username, team_name FROM users ORDER BY id LIMIT 33");
+        $stmt = $db->query("SELECT id, username, team_name FROM users ORDER BY id LIMIT 150");
         Router::json($stmt->fetchAll());
     } catch (\Throwable $e) {
         Router::json(['error' => $e->getMessage()], 500);

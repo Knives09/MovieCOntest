@@ -36,6 +36,16 @@
                     Sfide
                 </a>
 
+                <a href="/schema" class="nav-link <?= ($_SERVER['REQUEST_URI'] === '/schema' ? 'active' : '') ?>" id="nav-schema">
+                    <span class="nav-icon">🗂️</span>
+                    Schema DB
+                </a>
+
+                <a href="/graph-schema" class="nav-link teacher-only <?= ($_SERVER['REQUEST_URI'] === '/graph-schema' ? 'active' : '') ?>" id="nav-graph-schema" style="display:none">
+                    <span class="nav-icon">🕸️</span>
+                    Schema Grafo
+                </a>
+
                 <a href="/leaderboard" class="nav-link <?= ($_SERVER['REQUEST_URI'] === '/leaderboard' ? 'active' : '') ?>" id="nav-leaderboard">
                     <span class="nav-icon">🏆</span>
                     Classifica

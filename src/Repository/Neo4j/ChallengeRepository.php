@@ -118,21 +118,20 @@ class ChallengeRepository
     {
         $result = $this->client->run(
             'MATCH (u:User {id: $userId})-[r1:REVIEWED]->(m:Movie)
-                   <-[r2:REVIEWED]-(other:User)
-                   -[r3:REVIEWED]->(rec:Movie)
              WHERE r1.rating >= $minRating
-               AND r2.rating >= $minRating
-               AND r3.rating >= $minRating
-               AND NOT (u)-[:REVIEWED]->(rec)
+             WITH u, collect(m) AS myMovies
+             MATCH (m:Movie)<-[r2:REVIEWED]-(other:User)
+             WHERE m IN myMovies AND r2.rating >= $minRating AND other <> u
+             WITH u, myMovies, other
+             MATCH (other)-[r3:REVIEWED]->(rec:Movie)
+             WHERE r3.rating >= $minRating AND NOT rec IN myMovies
              WITH rec, 
                   COUNT(DISTINCT other) AS recommender_count,
-                  ROUND(AVG(r3.rating), 1) AS avg_recommender_rating,
-                  COLLECT(DISTINCT m.title)[0..3] AS based_on
+                  ROUND(AVG(r3.rating), 1) AS avg_recommender_rating
              RETURN rec.id AS id, rec.title AS title, 
                     rec.vote_average AS vote_average,
                     rec.poster_path AS poster_path,
-                    recommender_count, avg_recommender_rating,
-                    apoc.text.join(based_on, ", ") AS based_on
+                    recommender_count, avg_recommender_rating
              ORDER BY recommender_count DESC, avg_recommender_rating DESC
              LIMIT $limit',
             ['userId' => $userId, 'minRating' => $minRating, 'limit' => $limit]

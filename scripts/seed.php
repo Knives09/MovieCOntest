@@ -61,11 +61,11 @@ echo "   🔗 Cast relations: " . count($data['cast']) . "\n\n";
 echo "⭐ Step 2: Generating synthetic reviews...\n";
 
 $movieIds = array_keys($data['movies']);
-$reviewData = $importer->generateReviews($movieIds, 300, 60);
+$reviewData = $importer->generateReviews($movieIds, 400, 100);
 $data['users'] = $reviewData['users'];
 $data['reviews'] = $reviewData['reviews'];
 
-echo "   👥 Users: " . count($data['users']) . " (100 per team × 3 teams)\n";
+echo "   👥 Users: " . count($data['users']) . " (133 per team × 3 teams)\n";
 echo "   ⭐ Reviews: " . count($data['reviews']) . "\n\n";
 
 // ============================================================
