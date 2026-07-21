@@ -220,9 +220,9 @@ function createLeaderboardChart(canvasId, teams) {
     }
 
     const teamColors = {
-        'Team Alpha': '#f97316',
-        'Team Beta': '#00b4d8',
-        'Team Gamma': '#10b981',
+        'Team Flash': '#f97316',
+        'Team Batman': '#00b4d8',
+        'Team Green Lantern': '#10b981',
     };
 
     chartInstances[canvasId] = new Chart(ctx, {

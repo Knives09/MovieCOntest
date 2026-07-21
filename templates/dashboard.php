@@ -167,18 +167,18 @@
         <h2 class="section-title">Le Squadre</h2>
         <div class="teams-grid">
             <div class="team-card team-alpha" id="team-alpha">
-                <div class="team-icon">🦁</div>
-                <h3>Team Alpha</h3>
+                <div class="team-icon">⚡</div>
+                <h3>Team Flash</h3>
                 <div class="team-color-bar" style="background: #f97316"></div>
             </div>
             <div class="team-card team-beta" id="team-beta">
-                <div class="team-icon">🐲</div>
-                <h3>Team Beta</h3>
+                <div class="team-icon">🦇</div>
+                <h3>Team Batman</h3>
                 <div class="team-color-bar" style="background: #00b4d8"></div>
             </div>
             <div class="team-card team-gamma" id="team-gamma">
-                <div class="team-icon">🦅</div>
-                <h3>Team Gamma</h3>
+                <div class="team-icon">🟢</div>
+                <h3>Team Green Lantern</h3>
                 <div class="team-color-bar" style="background: #10b981"></div>
             </div>
         </div>

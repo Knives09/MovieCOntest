@@ -62,7 +62,14 @@ function setupChallenge1() {
         runBtn.addEventListener('click', async () => {
             const actorId = parseInt(document.getElementById('selected-actor-id').value);
             const maxDepth = 6;
-            const teamName = document.getElementById('team-code-input')?.value.trim().toUpperCase() || '';
+            const isTeacher = window.isTeacherMode();
+            const TEAM_CODES = {
+                'SPEEDFORCE': 'Team Flash',
+                'DARKKNIGHT': 'Team Batman',
+                'WILLPOWER': 'Team Green Lantern'
+            };
+            const teamCode = document.getElementById('team-code-input')?.value.trim().toUpperCase() || '';
+            const teamName = isTeacher ? 'Team Superman' : (TEAM_CODES[teamCode] || '');
             const queryVal = document.getElementById('sql-query-input')?.value || '';
 
             if (!actorId) return;
@@ -76,7 +83,8 @@ function setupChallenge1() {
                         actor_id: actorId, 
                         max_depth: maxDepth, 
                         team_name: teamName,
-                        sql_query: queryVal
+                        sql_query: queryVal,
+                        teacher_mode: window.isTeacherMode()
                     }),
                 });
 
@@ -115,7 +123,14 @@ function setupChallenge2() {
         runBtn.addEventListener('click', async () => {
             const actorId1 = parseInt(document.getElementById('selected-actor1-id').value);
             const actorId2 = parseInt(document.getElementById('selected-actor2-id').value);
-            const teamName = document.getElementById('team-code-input')?.value.trim().toUpperCase() || '';
+            const isTeacher = window.isTeacherMode();
+            const TEAM_CODES = {
+                'SPEEDFORCE': 'Team Flash',
+                'DARKKNIGHT': 'Team Batman',
+                'WILLPOWER': 'Team Green Lantern'
+            };
+            const teamCode = document.getElementById('team-code-input')?.value.trim().toUpperCase() || '';
+            const teamName = isTeacher ? 'Team Superman' : (TEAM_CODES[teamCode] || '');
             const queryVal = document.getElementById('sql-query-input')?.value || '';
 
             if (!actorId1 || !actorId2) return;
@@ -129,7 +144,8 @@ function setupChallenge2() {
                         actor_id_1: actorId1,
                         actor_id_2: actorId2,
                         team_name: teamName,
-                        sql_query: queryVal
+                        sql_query: queryVal,
+                        teacher_mode: window.isTeacherMode()
                     }),
                 });
 
@@ -168,7 +184,14 @@ function setupChallenge3() {
         runBtn.addEventListener('click', async () => {
             const userId = parseInt(document.getElementById('user-select')?.value || 1);
             const minRating = parseFloat(document.querySelector('.rating-btn.active')?.dataset.rating || 3.5);
-            const teamName = document.getElementById('team-code-input')?.value.trim().toUpperCase() || '';
+            const isTeacher = window.isTeacherMode();
+            const TEAM_CODES = {
+                'SPEEDFORCE': 'Team Flash',
+                'DARKKNIGHT': 'Team Batman',
+                'WILLPOWER': 'Team Green Lantern'
+            };
+            const teamCode = document.getElementById('team-code-input')?.value.trim().toUpperCase() || '';
+            const teamName = isTeacher ? 'Team Superman' : (TEAM_CODES[teamCode] || '');
             const queryVal = document.getElementById('sql-query-input')?.value || '';
 
             setRunning(runBtn, true);
@@ -180,7 +203,8 @@ function setupChallenge3() {
                         user_id: userId,
                         min_rating: minRating,
                         team_name: teamName,
-                        sql_query: queryVal
+                        sql_query: queryVal,
+                        teacher_mode: window.isTeacherMode()
                     }),
                 });
 

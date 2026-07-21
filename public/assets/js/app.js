@@ -209,11 +209,37 @@ function updateRunButton() {
 
     const challengeId = parseInt(challengePage.dataset.challengeId);
     const teamCodeInput = document.getElementById('team-code-input');
-    const teamCode = teamCodeInput ? teamCodeInput.value.trim() : '';
+    const teamCode = teamCodeInput ? teamCodeInput.value.trim().toUpperCase() : '';
     const queryInput = document.getElementById('sql-query-input');
     const queryText = queryInput ? queryInput.value.trim() : '';
+
+    const isTeacher = window.isTeacherMode();
+    const TEAM_CODES = {
+        'SPEEDFORCE': 'Team Flash',
+        'DARKKNIGHT': 'Team Batman',
+        'WILLPOWER': 'Team Green Lantern'
+    };
+    const teamName = isTeacher ? 'Team Superman' : (TEAM_CODES[teamCode] || null);
+
+    // Update dynamic feedback hint
+    const hint = document.getElementById('team-code-hint');
+    if (hint && teamCodeInput) {
+        if (isTeacher) {
+            hint.textContent = '✓ Modalità Docente: Squadra di default è Team Superman.';
+            hint.style.color = '#10b981';
+        } else if (teamCode.length === 0) {
+            hint.textContent = 'Ogni squadra deve usare il proprio codice univoco assegnato dal docente.';
+            hint.style.color = '';
+        } else if (teamName) {
+            hint.textContent = `✓ Codice valido: ${teamName}`;
+            hint.style.color = '#10b981';
+        } else {
+            hint.textContent = '✗ Codice non valido.';
+            hint.style.color = '#ef4444';
+        }
+    }
     
-    let ready = teamCode.length >= 2 && queryText.length > 5;
+    let ready = (isTeacher || !!teamName) && queryText.length > 5;
 
     if (challengeId === 1) {
         ready = ready && !!document.getElementById('selected-actor-id')?.value;
@@ -225,7 +251,7 @@ function updateRunButton() {
 
     runBtn.disabled = !ready;
     if (scalabilityBtn) {
-        scalabilityBtn.disabled = teamCode.length < 2 || !document.getElementById('selected-actor-id')?.value;
+        scalabilityBtn.disabled = (isTeacher || teamCode.length >= 2) && !document.getElementById('selected-actor-id')?.value;
     }
 }
 
@@ -280,6 +306,7 @@ window.highlightCypher = function(codeText) {
 
 window.setTeacherMode = function(enabled) {
     localStorage.setItem('teacher_mode', enabled ? 'true' : 'false');
+    document.cookie = "teacher_mode=" + (enabled ? "true" : "false") + "; path=/; max-age=31536000";
     applyTeacherModeStyles();
 };
 
@@ -316,6 +343,28 @@ window.applyTeacherModeStyles = function() {
             el.style.display = isTeacher ? 'none' : 'block';
         }
     });
+
+    // Hide team code group in teacher mode
+    const teamCodeInput = document.getElementById('team-code-input');
+    if (teamCodeInput) {
+        const teamCodeGroup = teamCodeInput.closest('.control-group');
+        if (teamCodeGroup) {
+            teamCodeGroup.style.display = isTeacher ? 'none' : 'block';
+        }
+    }
+
+    // Update SQL editor template if teacher mode toggled
+    const queryInput = document.getElementById('sql-query-input');
+    if (queryInput) {
+        if (isTeacher) {
+            queryInput.value = queryInput.dataset.solution || queryInput.value;
+        } else {
+            queryInput.value = queryInput.dataset.template || queryInput.value;
+        }
+        if (window.updateRunButton) {
+            window.updateRunButton();
+        }
+    }
 
     // Highlight Cypher query code if present
     const cypherCodeEl = document.getElementById('cypher-code');
@@ -364,9 +413,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const val = urlParams.get('teacher');
         if (val === '1' || val === 'true') {
             localStorage.setItem('teacher_mode', 'true');
+            document.cookie = "teacher_mode=true; path=/; max-age=31536000";
         } else if (val === '0' || val === 'false') {
             localStorage.setItem('teacher_mode', 'false');
+            document.cookie = "teacher_mode=false; path=/; max-age=31536000";
         }
+    } else if (localStorage.getItem('teacher_mode')) {
+        const enabled = localStorage.getItem('teacher_mode') === 'true';
+        document.cookie = "teacher_mode=" + (enabled ? "true" : "false") + "; path=/; max-age=31536000";
     }
 
     window.applyTeacherModeStyles();
@@ -461,7 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 `<option value="${u.id}">${u.username} (${u.team_name})</option>`
             ).join('');
         }).catch(() => {
-            userSelect.innerHTML = '<option value="1">user_1 (Team Alpha)</option>';
+            userSelect.innerHTML = '<option value="1">user_1 (Team Flash)</option>';
         });
     }
 

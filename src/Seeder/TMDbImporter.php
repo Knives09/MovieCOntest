@@ -158,7 +158,7 @@ class TMDbImporter
     {
         $users = [];
         $reviews = [];
-        $teams = ['Team Alpha', 'Team Beta', 'Team Gamma'];
+        $teams = ['Team Flash', 'Team Batman', 'Team Green Lantern'];
 
         // Create synthetic users (11 per team)
         for ($i = 1; $i <= $numUsers; $i++) {

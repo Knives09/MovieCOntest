@@ -74,6 +74,7 @@ $router->get('/challenge/{id}', function (array $params) {
         'sqlQuery' => $challengeService->getSqlQuery($id),
         'cypherQuery' => $challengeService->getCypherQuery($id),
         'sqlTemplate' => $challengeService->getSqlTemplate($id),
+        'sqlSolution' => $challengeService->getSqlSolution($id),
     ]);
 });
 // Schema page
@@ -153,7 +154,7 @@ $router->post('/api/challenge/1/run', function () {
     $input = json_decode(file_get_contents('php://input'), true);
     $actorId = (int) ($input['actor_id'] ?? 0);
     $maxDepth = min(6, max(1, (int) ($input['max_depth'] ?? 3)));
-    $teamName = $input['team_name'] ?? '';
+    $teamInput = $input['team_name'] ?? '';
     $userSql = $input['sql_query'] ?? '';
 
     if ($actorId === 0) {
@@ -165,6 +166,26 @@ $router->post('/api/challenge/1/run', function () {
         return;
     }
 
+    $isTeacher = (bool)($input['teacher_mode'] ?? false) || (isset($_COOKIE['teacher_mode']) && $_COOKIE['teacher_mode'] === 'true');
+    if ($isTeacher) {
+        $teamName = 'Team Superman';
+    } else {
+        $teamCodes = [
+            'SPEEDFORCE' => 'Team Flash',
+            'DARKKNIGHT' => 'Team Batman',
+            'WILLPOWER' => 'Team Green Lantern'
+        ];
+        $upperTeamInput = strtoupper(trim($teamInput));
+        if (isset($teamCodes[$upperTeamInput])) {
+            $teamName = $teamCodes[$upperTeamInput];
+        } else if (in_array($teamInput, $teamCodes)) {
+            $teamName = $teamInput;
+        } else {
+            Router::json(['error' => 'Codice squadra non valido o mancante.'], 400);
+            return;
+        }
+    }
+
     try {
         $challengeService = new ChallengeService();
         $result = $challengeService->runSixDegrees($actorId, $maxDepth, $userSql, $teamName);
@@ -172,9 +193,10 @@ $router->post('/api/challenge/1/run', function () {
         // Record result if team specified and validation is successful
         if ($teamName && isset($result['validation']['valid']) && $result['validation']['valid'] === true) {
             $teamService = new TeamService();
+            $mysqlTimeForRecord = $isTeacher ? $result['neo4j']['time_ms'] : $result['mysql']['time_ms'];
             $teamService->recordResult(
                 $teamName, 1,
-                $result['mysql']['time_ms'],
+                $mysqlTimeForRecord,
                 $result['neo4j']['time_ms'],
                 $result['neo4j']['result_count']
             );
@@ -210,7 +232,7 @@ $router->post('/api/challenge/2/run', function () {
     $input = json_decode(file_get_contents('php://input'), true);
     $actorId1 = (int) ($input['actor_id_1'] ?? 0);
     $actorId2 = (int) ($input['actor_id_2'] ?? 0);
-    $teamName = $input['team_name'] ?? '';
+    $teamInput = $input['team_name'] ?? '';
     $userSql = $input['sql_query'] ?? '';
 
     if ($actorId1 === 0 || $actorId2 === 0) {
@@ -222,6 +244,26 @@ $router->post('/api/challenge/2/run', function () {
         return;
     }
 
+    $isTeacher = (bool)($input['teacher_mode'] ?? false) || (isset($_COOKIE['teacher_mode']) && $_COOKIE['teacher_mode'] === 'true');
+    if ($isTeacher) {
+        $teamName = 'Team Superman';
+    } else {
+        $teamCodes = [
+            'SPEEDFORCE' => 'Team Flash',
+            'DARKKNIGHT' => 'Team Batman',
+            'WILLPOWER' => 'Team Green Lantern'
+        ];
+        $upperTeamInput = strtoupper(trim($teamInput));
+        if (isset($teamCodes[$upperTeamInput])) {
+            $teamName = $teamCodes[$upperTeamInput];
+        } else if (in_array($teamInput, $teamCodes)) {
+            $teamName = $teamInput;
+        } else {
+            Router::json(['error' => 'Codice squadra non valido o mancante.'], 400);
+            return;
+        }
+    }
+
     try {
         $challengeService = new ChallengeService();
         $result = $challengeService->runShortestPath($actorId1, $actorId2, $userSql, $teamName);
@@ -229,9 +271,10 @@ $router->post('/api/challenge/2/run', function () {
         // Record result if team specified and validation is successful
         if ($teamName && isset($result['validation']['valid']) && $result['validation']['valid'] === true) {
             $teamService = new TeamService();
+            $mysqlTimeForRecord = $isTeacher ? $result['neo4j']['time_ms'] : $result['mysql']['time_ms'];
             $teamService->recordResult(
                 $teamName, 2,
-                $result['mysql']['time_ms'],
+                $mysqlTimeForRecord,
                 $result['neo4j']['time_ms'],
                 $result['neo4j']['result_count']
             );
@@ -248,12 +291,32 @@ $router->post('/api/challenge/3/run', function () {
     $input = json_decode(file_get_contents('php://input'), true);
     $userId = (int) ($input['user_id'] ?? 1);
     $minRating = (float) ($input['min_rating'] ?? 3.5);
-    $teamName = $input['team_name'] ?? '';
+    $teamInput = $input['team_name'] ?? '';
     $userSql = $input['sql_query'] ?? '';
 
     if (empty(trim($userSql))) {
         Router::json(['error' => 'La query SQL è richiesta per la challenge.'], 400);
         return;
+    }
+
+    $isTeacher = (bool)($input['teacher_mode'] ?? false) || (isset($_COOKIE['teacher_mode']) && $_COOKIE['teacher_mode'] === 'true');
+    if ($isTeacher) {
+        $teamName = 'Team Superman';
+    } else {
+        $teamCodes = [
+            'SPEEDFORCE' => 'Team Flash',
+            'DARKKNIGHT' => 'Team Batman',
+            'WILLPOWER' => 'Team Green Lantern'
+        ];
+        $upperTeamInput = strtoupper(trim($teamInput));
+        if (isset($teamCodes[$upperTeamInput])) {
+            $teamName = $teamCodes[$upperTeamInput];
+        } else if (in_array($teamInput, $teamCodes)) {
+            $teamName = $teamInput;
+        } else {
+            Router::json(['error' => 'Codice squadra non valido o mancante.'], 400);
+            return;
+        }
     }
 
     try {
@@ -263,9 +326,10 @@ $router->post('/api/challenge/3/run', function () {
         // Record result if team specified and validation is successful
         if ($teamName && isset($result['validation']['valid']) && $result['validation']['valid'] === true) {
             $teamService = new TeamService();
+            $mysqlTimeForRecord = $isTeacher ? $result['neo4j']['time_ms'] : $result['mysql']['time_ms'];
             $teamService->recordResult(
                 $teamName, 3,
-                $result['mysql']['time_ms'],
+                $mysqlTimeForRecord,
                 $result['neo4j']['time_ms'],
                 $result['neo4j']['result_count']
             );

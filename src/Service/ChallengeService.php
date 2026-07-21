@@ -576,4 +576,91 @@ SQL,
             default => '-- Nessun template disponibile per questa sfida.',
         };
     }
+
+    /**
+     * Get SQL solution query for a challenge.
+     */
+    public function getSqlSolution(int $challengeId): string
+    {
+        return match ($challengeId) {
+            1 => <<<'SQL'
+WITH RECURSIVE actor_connections AS (
+    -- Caso base: seleziona gli attori direttamente connessi all'attore di partenza (:actor_id)
+    SELECT mc2.actor_id, 1 as depth
+    FROM movie_cast mc1
+    JOIN movie_cast mc2 ON mc1.movie_id = mc2.movie_id AND mc1.actor_id != mc2.actor_id
+    WHERE mc1.actor_id = :actor_id
+    
+    UNION
+    
+    -- Caso ricorsivo: connetti gli attori trovati al passo precedente con i loro co-protagonisti
+    SELECT mc2.actor_id, ac.depth + 1
+    FROM actor_connections ac
+    JOIN movie_cast mc1 ON mc1.actor_id = ac.actor_id
+    JOIN movie_cast mc2 ON mc1.movie_id = mc2.movie_id AND mc1.actor_id != mc2.actor_id
+    WHERE ac.depth < :max_depth
+)
+SELECT a.name, MIN(ac.depth) as degrees
+FROM actor_connections ac
+JOIN actors a ON a.id = ac.actor_id
+GROUP BY a.name
+ORDER BY degrees;
+SQL,
+            2 => <<<'SQL'
+WITH RECURSIVE bfs_path AS (
+    -- Caso base: parti dall'attore 1 (:actor_id_1)
+    SELECT 
+        mc1.actor_id AS current_actor_id,
+        CAST(a.name AS CHAR(1000)) AS path_names,
+        1 AS depth,
+        CAST(CONCAT(',', mc1.actor_id, ',') AS CHAR(1000)) AS visited
+    FROM actors a
+    JOIN movie_cast mc1 ON a.id = mc1.actor_id
+    WHERE mc1.actor_id = :actor_id_1
+
+    UNION ALL
+
+    -- Caso ricorsivo: naviga verso attori connessi tramite i film
+    SELECT 
+        mc2.actor_id AS current_actor_id,
+        CONCAT(bp.path_names, ' -> ', m.title, ' -> ', a2.name) AS path_names,
+        bp.depth + 1 AS depth,
+        CONCAT(bp.visited, mc2.actor_id, ',') AS visited
+    FROM bfs_path bp
+    JOIN movie_cast mc1 ON mc1.actor_id = bp.current_actor_id
+    JOIN movies m ON m.id = mc1.movie_id
+    JOIN movie_cast mc2 ON mc2.movie_id = mc1.movie_id AND mc2.actor_id != mc1.actor_id
+    JOIN actors a2 ON a2.id = mc2.actor_id
+    WHERE POSITION(CONCAT(',', mc2.actor_id, ',') IN bp.visited) = 0
+      AND bp.depth < 4
+)
+SELECT path_names
+FROM bfs_path
+WHERE current_actor_id = :actor_id_2
+ORDER BY depth ASC
+LIMIT 1;
+SQL,
+            3 => <<<'SQL'
+SELECT m.title, 
+       COUNT(DISTINCT r3.user_id) as score,
+       AVG(r3.rating) as avg_rating
+FROM reviews r1
+-- R2: recensioni degli altri utenti sullo stesso film (r1.movie_id)
+JOIN reviews r2 ON r1.movie_id = r2.movie_id AND r1.user_id != r2.user_id AND r2.rating >= :min_rating
+-- R3: recensioni degli altri utenti (r2.user_id) su ALTRI film (diversi da r1.movie_id)
+JOIN reviews r3 ON r2.user_id = r3.user_id AND r3.movie_id != r1.movie_id AND r3.rating >= :min_rating
+JOIN movies m ON m.id = r3.movie_id
+WHERE r1.user_id = :user_id 
+  AND r1.rating >= :min_rating
+  AND r3.movie_id NOT IN (
+      SELECT movie_id FROM reviews WHERE user_id = :user_id
+  )
+GROUP BY m.title
+ORDER BY score DESC 
+LIMIT 10;
+SQL,
+            default => '-- Nessuna soluzione disponibile per questa sfida.',
+        };
+    }
 }
+

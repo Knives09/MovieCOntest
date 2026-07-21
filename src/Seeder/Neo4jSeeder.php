@@ -194,11 +194,26 @@ class Neo4jSeeder
         if (empty($users)) return;
         if ($onProgress) $onProgress(0, 0, "  👥 Creazione nodi User in Neo4j...");
 
+        $teamMap = [
+            'Team Alpha' => 'Team Flash',
+            'Team Beta' => 'Team Batman',
+            'Team Gamma' => 'Team Green Lantern'
+        ];
+
+        $mappedUsers = [];
+        foreach ($users as $user) {
+            $mappedUsers[] = [
+                'id' => $user['id'],
+                'username' => $user['username'],
+                'team_name' => $teamMap[$user['team_name']] ?? $user['team_name']
+            ];
+        }
+
         $this->client->run(
             'UNWIND $users AS u
              MERGE (user:User {id: u.id})
              SET user.username = u.username, user.team_name = u.team_name',
-            ['users' => $users]
+            ['users' => $mappedUsers]
         );
     }
 

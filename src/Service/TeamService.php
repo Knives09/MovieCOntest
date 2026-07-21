@@ -61,6 +61,7 @@ class TeamService
                         ROUND(AVG(neo4j_time_ms), 1) as avg_neo4j_ms,
                         MAX(completed_at) as last_activity
                  FROM challenge_results
+                 WHERE team_name != 'Team Superman'
                  GROUP BY team_name
                  ORDER BY total_score DESC, avg_mysql_ms ASC"
             );
@@ -116,9 +117,9 @@ class TeamService
     public function getDefaultTeams(): array
     {
         return [
-            ['name' => 'Team Alpha', 'color' => '#f97316', 'icon' => '🦁'],
-            ['name' => 'Team Beta', 'color' => '#00b4d8', 'icon' => '🐲'],
-            ['name' => 'Team Gamma', 'color' => '#10b981', 'icon' => '🦅'],
+            ['name' => 'Team Flash', 'color' => '#f97316', 'icon' => '⚡'],
+            ['name' => 'Team Batman', 'color' => '#00b4d8', 'icon' => '🦇'],
+            ['name' => 'Team Green Lantern', 'color' => '#10b981', 'icon' => '🟢'],
         ];
     }
 }

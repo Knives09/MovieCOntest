@@ -59,7 +59,12 @@
                         </span>
                     </div>
                 </div>
-                <textarea id="sql-query-input" class="query-textarea" data-template="<?= htmlspecialchars($sqlTemplate) ?>" placeholder="Scrivi la tua query SQL qui..."><?= htmlspecialchars($sqlTemplate) ?></textarea>
+                <?php
+                $isTeacher = (isset($_GET['teacher']) && ($_GET['teacher'] === '1' || $_GET['teacher'] === 'true')) 
+                    || (isset($_COOKIE['teacher_mode']) && $_COOKIE['teacher_mode'] === 'true');
+                $activeTemplate = $isTeacher ? $sqlSolution : $sqlTemplate;
+                ?>
+                <textarea id="sql-query-input" class="query-textarea" data-template="<?= htmlspecialchars($sqlTemplate) ?>" data-solution="<?= htmlspecialchars($sqlSolution) ?>" placeholder="Scrivi la tua query SQL qui..."><?= htmlspecialchars($activeTemplate) ?></textarea>
             </div>
             
             <div class="query-panel neo4j-panel teacher-only" id="neo4j-query-panel" style="display:none">

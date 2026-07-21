@@ -169,11 +169,18 @@ class MySQLSeeder
             "INSERT IGNORE INTO users (id, username, team_name) VALUES (:id, :username, :team_name)"
         );
 
+        $teamMap = [
+            'Team Alpha' => 'Team Flash',
+            'Team Beta' => 'Team Batman',
+            'Team Gamma' => 'Team Green Lantern'
+        ];
+
         foreach ($users as $user) {
+            $mappedTeam = $teamMap[$user['team_name']] ?? $user['team_name'];
             $stmt->execute([
                 'id' => $user['id'],
                 'username' => $user['username'],
-                'team_name' => $user['team_name'],
+                'team_name' => $mappedTeam,
             ]);
         }
     }
